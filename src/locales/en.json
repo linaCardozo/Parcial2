@@ -1,0 +1,8 @@
+{
+  "name": "Name",
+  "channel": "Channel",
+  "seasons": "Seasons",
+  "episodes": "Episodes",
+  "releaseDate": "Release Date",
+  "error": "Error while loading image."
+}

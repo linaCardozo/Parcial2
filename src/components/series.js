@@ -1,41 +1,90 @@
 import React, { useState, useEffect } from "react";
-import Serie from "./serie";
+import SerieDetail from "./serieDetail";
+import { FormattedMessage } from "react-intl";
+import { FormattedDate } from "react-intl";
 
-const Series = () => {
-  const [state, setState] = useState({ series: [] });
+const Series = (props) => {
+  const [series, setSeries] = useState([]);
+
+  const [detail, setDetail] = useState();
 
   useEffect(() => {
-    const url =
-      "https://gist.githubusercontent.com/josejbocanegra/c55d86de9e0dae79e3308d95e78f997f/raw/a467415350e87c13faf9c8e843ea2fd20df056f3/series-es.json";
-    fetch(url)
-      .then((res) => {
-        return res.json();
-      })
-      .then((series) => {
-        setState({ series });
+    if (!navigator.onLine) {
+      if (localStorage.getItem("series") === null) {
+        setSeries("Loading...");
+      } else {
+        setSeries(JSON.parse(localStorage.getItem("series")));
+      }
+    }
+
+    fetch(props.url)
+      .then((result) => result.json())
+      .then((result) => {
+        setSeries(result);
+        localStorage.setItem("series", JSON.stringify(result));
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const Serie = (props) => {
+    let date = props.serie.release.split("/");
+    return (
+      <tr onClick={() => setDetail(props.serie.id - 1)}>
+        <th scope="row">{props.serie.id}</th>
+        <td>{props.serie.name}</td>
+        <td>{props.serie.channel}</td>
+        <td>{props.serie.seasons}</td>
+        <td>{props.serie.episodes}</td>
+        <td>
+          <FormattedDate value={new Date(date[2], date[1] - 1, date[0])} />
+        </td>
+      </tr>
+    );
+  };
+
+  const ShowDetail = (props) => {
+    if (detail !== -1) {
+      return <SerieDetail serie={props.serie}></SerieDetail>;
+    } else {
+      return <></>;
+    }
+  };
 
   return (
     <div>
-      <table className="table">
-        <thead className="table-striped">
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Name</th>
-            <th scope="col">Channel</th>
-            <th scope="col">Seasons</th>
-            <th scope="col">Episodes</th>
-            <th scope="col">Release date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {console.log("Series", state.series)}
-          {state.series.map((e, i) => (
-            <Serie key={i} serie={e} />
-          ))}
-        </tbody>
-      </table>
+      <div className="col-9" style={{ float: "left" }}>
+        <table className="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">
+                <FormattedMessage id="name" />
+              </th>
+              <th scope="col">
+                <FormattedMessage id="channel" />
+              </th>
+              <th scope="col">
+                <FormattedMessage id="seasons" />
+              </th>
+              <th scope="col">
+                <FormattedMessage id="episodes" />
+              </th>
+              <th scope="col">
+                <FormattedMessage id="releaseDate" />
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {series.map((e, i) => (
+              <Serie key={i} serie={e} />
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="col-3" style={{ float: "right" }}>
+        <ShowDetail serie={series[detail]}></ShowDetail>
+      </div>
     </div>
   );
 };

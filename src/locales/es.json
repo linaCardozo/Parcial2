@@ -1,0 +1,8 @@
+{
+  "name": "Nombre",
+  "channel": "Canal",
+  "seasons": "Temporadas",
+  "episodes": "Episodios",
+  "releaseDate": "Fecha de lanzamiento",
+  "error": "Error al cargar la imagen."
+}
